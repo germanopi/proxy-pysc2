@@ -6,7 +6,7 @@ from sc2.ids.unit_typeid import UnitTypeId
 
 
 class WorkerAgent(sc2.BotAI):
-    async def on_step(self, iteration: int):
+    async def doAction(self):
         await self.build_workers()
         await self.distribute_workers()
         await self.build_vespene()

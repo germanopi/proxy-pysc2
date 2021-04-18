@@ -9,7 +9,7 @@ from sc2.ids.unit_typeid import UnitTypeId
 
 
 class ProxyAgent(sc2.BotAI):
-    async def on_step(self, iteration):
+    async def doAction(self):
         await self.build_barracks()
         await self.build_bunker()
         await self.build_army()
@@ -17,21 +17,18 @@ class ProxyAgent(sc2.BotAI):
 
     # Build proxy barracks
     async def build_barracks(self):
-        for commandCenter in self.townhalls().ready:
             if self.structures(UnitTypeId.BARRACKS).amount < 3 or (
-                self.can_afford(UnitTypeId.BARRACKS) and self.structures(UnitTypeId.BARRACKS).amount < 5
+                self.minerals > 400 and self.structures(UnitTypeId.BARRACKS).amount < 5
             ):
                 if self.can_afford(UnitTypeId.BARRACKS):
                     p: Point2 = self.game_info.map_center.towards(self.enemy_start_locations[0], 25)
                     await self.build(UnitTypeId.BARRACKS, near=p)
 
     async def build_bunker(self):
-        for commandCenter in self.townhalls().ready:
             if(self.can_afford(UnitTypeId.BUNKER)):
-                if(self.structures.closer_than(18, commandCenter.position).filter(lambda structure: structure.type_id == UnitTypeId.BUNKER).amount < 3):
-                    if(self.already_pending(UnitTypeId.BUNKER) + self.structures(UnitTypeId.BUNKER).amount < self.townhalls().ready.amount * 3):
-                        p: Point2 = self.game_info.map_center.towards(self.enemy_start_locations[0], 25)
-                        await self.build(UnitTypeId.BUNKER, near=p)
+                if(self.already_pending(UnitTypeId.BUNKER) + self.structures(UnitTypeId.BUNKER).amount < self.townhalls().ready.amount * 3):
+                    p: Point2 = self.game_info.map_center.towards(self.enemy_start_locations[0], 25)
+                    await self.build(UnitTypeId.BUNKER, near=p)
 
     # Train marines
     async def build_army(self):

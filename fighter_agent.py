@@ -9,7 +9,7 @@ from sc2.ids.unit_typeid import UnitTypeId
 
 
 class FighterAgent(sc2.BotAI):
-    async def on_step(self, iteration):
+    async def doAction(self):
         await self.attack()
 
     #SAVING FOR NEXT

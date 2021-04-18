@@ -8,12 +8,23 @@ from proxy_agent import ProxyAgent
 from fighter_agent import FighterAgent
 
 class MasterAgent(sc2.BotAI):
-    
+    workerAgent = None
+    proxyAgent = None
+    fighterAgent = None
+
     async def on_step(self, iteration):
-        WorkerAgent.on_step()
-        if self.can_afford(UnitTypeId.BARRACKS):
-            ProxyAgent()
-            FighterAgent()
+        init = True
+        if init:
+            self.workerAgent = WorkerAgent(self)
+            self.proxyAgent = ProxyAgent(self)
+            self.fighterAgent = FighterAgent(self)
+            init = False
+        else:
+            self.workerAgent.doAction()
+            if self.can_afford(UnitTypeId.BARRACKS):
+                self.proxyAgent.doAction()
+                self.fighterAgent.doAction()
+
 
 sc2.run_game(
     sc2.maps.get("AcropolisLE"),
