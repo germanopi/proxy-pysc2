@@ -11,7 +11,7 @@ from sc2.ids.unit_typeid import UnitTypeId
 class ProxyAgent():
     def __init__(self, Bot):
         self.bot = Bot
-    
+
     async def doAction(self):
         await self.build_barracks()
      #   await self.build_bunker()
@@ -33,6 +33,7 @@ class ProxyAgent():
 
     # Train marines
     async def build_army(self):
-        for rax in self.bot.structures(UnitTypeId.BARRACKS).ready.idle:
+        proxyp: Point2 = self.bot.game_info.map_center.towards(self.bot.enemy_start_locations[0], 25)
+        for rax in self.bot.structures.closer_than(25, proxyp).filter(lambda structure: structure.type_id == UnitTypeId.BARRACKS).ready.idle:
             if self.bot.can_afford(UnitTypeId.MARINE):
                 rax.train(UnitTypeId.MARINE)

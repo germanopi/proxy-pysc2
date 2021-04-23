@@ -21,7 +21,8 @@ class MilitarWorker():
             await self.upgrade_techlab()
             await self.build_engineering_bay()
             await self.build_factory()
-            await self.build_armory()
+            await self.build_starport()
+            #await self.build_armory()
             await self.build_army()
         
     # Remover for de townhalls onde reelevante
@@ -68,7 +69,7 @@ class MilitarWorker():
                 if not self.bot.already_pending(UnitTypeId.BARRACKS):
                     if(self.bot.structures.closer_than(25, commandCenter.position).filter(lambda structure: structure.type_id == UnitTypeId.BARRACKS).amount < 2):
                         position_towards_map_center=commandCenter.position.towards(
-                            self.bot.game_info.map_center, distance=12)
+                            self.bot.game_info.map_center, distance=14)
                         await self.bot.build(UnitTypeId.BARRACKS, position_towards_map_center)
                         #SELECIONAR AS BARRACA PERTO E DAR O UPGRADE QUE FAZ MARAUDER
 
@@ -85,7 +86,7 @@ class MilitarWorker():
 # SELECIONAR BARRACAS DA BASE APENAS
     async def build_army(self):
         unit = None
-        if self.bot.can_afford(UnitTypeId.MARAUDER)  and self.bot.units(UnitTypeId.MARAUDER).amount < 8:
+        if self.bot.can_afford(UnitTypeId.MARAUDER)  and self.bot.units(UnitTypeId.MARAUDER).amount < 4:
             unit = UnitTypeId.MARAUDER
         elif self.bot.can_afford(UnitTypeId.MEDIVAC) and self.bot.units(UnitTypeId.MEDIVAC).amount < 3:
             unit = UnitTypeId.MEDIVAC
@@ -97,10 +98,12 @@ class MilitarWorker():
             unit = UnitTypeId.MARINE
         if not unit:
             return
-        for rax in self.bot.structures(UnitTypeId.BARRACKS).ready.idle:
-            if(unit == UnitTypeId.MARAUDER and rax.has_techlab):
+        for rax in self.bot.structures.of_type({UnitTypeId.BARRACKS, UnitTypeId.STARPORT}).ready.idle:
+            if(unit == UnitTypeId.MARAUDER and rax.type_id == UnitTypeId.BARRACKS and rax.has_techlab):
                 rax.train(unit)
-            elif(unit == UnitTypeId.MARINE):
+            elif(unit == UnitTypeId.MARINE and rax.type_id == UnitTypeId.BARRACKS):
+                rax.train(unit)
+            elif(unit == UnitTypeId.MEDIVAC and rax.type_id == UnitTypeId.STARPORT):
                 rax.train(unit)
             else:
                 return

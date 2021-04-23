@@ -17,7 +17,7 @@ class MasterAgent(sc2.BotAI):
 
     async def on_step(self, iteration):
         if self.can_afford(UnitTypeId.BARRACKS):
-            if self.time < 300:
+            if self.time < 420:
                 await self.proxyAgent.doAction()
             await self.fighterAgent.doAction()
         await self.militarWorker.doAction()
