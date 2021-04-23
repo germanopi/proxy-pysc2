@@ -4,6 +4,7 @@ from sc2.bot_ai import BotAI
 from sc2.player import Bot, Computer
 from sc2.ids.unit_typeid import UnitTypeId
 from sc2.ids.ability_id import AbilityId
+from sc2.ids.upgrade_id import UpgradeId
 from sc2.unit import Unit
 from sc2.units import Units
 
@@ -23,9 +24,10 @@ class WorkerAgent():
         else:
             await self.build_supplyDepot()
         await self.bot.distribute_workers()
-        await self.expand()
+        if self.bot.minerals>500:
+            await self.expand()
         await self.all_in()
-        if (self.bot.time > 180):
+        if (self.bot.time > 80):
             await self.build_vespene()
 
     async def check_ramp(self):
@@ -73,6 +75,8 @@ class WorkerAgent():
 
     async def expand(self):
         if self.bot.townhalls().amount < 2 and self.bot.can_afford(UnitTypeId.COMMANDCENTER):
+            await self.bot.expand_now()
+        if self.bot.townhalls().amount < 3 and self.bot.can_afford(UnitTypeId.COMMANDCENTER) and self.bot.time>120:
             await self.bot.expand_now()
 
     async def build_supplyDepot(self):
