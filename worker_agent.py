@@ -19,7 +19,7 @@ class WorkerAgent():
         await self.check_ramp()
         if not self.rampbool:
             await self.supply_ramp()
-            await self.barracks_ramp()
+            #await self.barracks_ramp()
         else:
             await self.build_supplyDepot()
         await self.bot.distribute_workers()
@@ -44,7 +44,7 @@ class WorkerAgent():
                     break
 
     async def supply_ramp(self):
-        depot_placement_positions: Set[Point2] = self.bot.main_base_ramp.corner_depots
+        depot_placement_positions = self.bot.main_base_ramp.corner_depots | {self.bot.main_base_ramp.depot_in_middle}
         depots: Units = self.bot.structures.of_type({UnitTypeId.SUPPLYDEPOT, UnitTypeId.SUPPLYDEPOTLOWERED})
         if depots:
             depot_placement_positions: Set[Point2] = {
@@ -52,6 +52,7 @@ class WorkerAgent():
             }
         if self.bot.can_afford(UnitTypeId.SUPPLYDEPOT) and self.bot.already_pending(UnitTypeId.SUPPLYDEPOT) == 0:
             if len(depot_placement_positions) == 0:
+                self.rampbool = True
                 return
             # Choose any depot location
             target_depot_location: Point2 = depot_placement_positions.pop()
