@@ -6,29 +6,26 @@ from sc2.ids.unit_typeid import UnitTypeId
 from worker_agent import WorkerAgent
 from proxy_agent import ProxyAgent
 from fighter_agent import FighterAgent
+from militar_worker import MilitarWorker
 
 class MasterAgent(sc2.BotAI):
-    workerAgent = None
-    proxyAgent = None
-    fighterAgent = None
+    def __init__(self):
+        self.workerAgent = WorkerAgent(self)
+        self.proxyAgent = ProxyAgent(self)
+        self.fighterAgent = FighterAgent(self)
+        self.militarWorker = MilitarWorker(self)
 
     async def on_step(self, iteration):
-        init = True
-        if init:
-            self.workerAgent = WorkerAgent(self)
-            self.proxyAgent = ProxyAgent(self)
-            self.fighterAgent = FighterAgent(self)
-            init = False
-        else:
-            self.workerAgent.doAction()
-            if self.can_afford(UnitTypeId.BARRACKS):
-                self.proxyAgent.doAction()
-                self.fighterAgent.doAction()
-
+        if self.can_afford(UnitTypeId.BARRACKS):
+            if self.time < 300:
+                await self.proxyAgent.doAction()
+            await self.fighterAgent.doAction()
+        await self.militarWorker.doAction()
+        await self.workerAgent.doAction()
 
 sc2.run_game(
     sc2.maps.get("AcropolisLE"),
     [Bot(sc2.Race.Terran, MasterAgent()), Computer(
-        sc2.Race.Zerg, sc2.Difficulty.Easy)],
+        sc2.Race.Protoss, sc2.Difficulty.Easy)],
     realtime=False,
 )
