@@ -26,6 +26,6 @@ class MasterAgent(sc2.BotAI):
 sc2.run_game(
     sc2.maps.get("AcropolisLE"),
     [Bot(sc2.Race.Terran, MasterAgent()), Computer(
-        sc2.Race.Protoss, sc2.Difficulty.Hard)],
+        sc2.Race.Protoss, sc2.Difficulty.Easy)],
     realtime=False,
 )
