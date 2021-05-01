@@ -22,10 +22,10 @@ class MilitarWorker():
             await self.build_engineering_bay()
             await self.build_factory()
             await self.build_starport()
-            #await self.build_armory()
             await self.build_army()
+            if self.bot.minerals > 550:
+                await self.build_armory()
         
-    # Remover for de townhalls onde reelevante
     async def build_engineering_bay(self):
         for commandCenter in self.bot.townhalls().ready:
             if self.bot.can_afford(UnitTypeId.ENGINEERINGBAY) and self.bot.structures(UnitTypeId.ENGINEERINGBAY).amount <1  :
@@ -38,29 +38,54 @@ class MilitarWorker():
             bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
             if bay_ready:
                 self.bot.research(UpgradeId.TERRANINFANTRYWEAPONSLEVEL1)
+
+        if self.bot.already_pending_upgrade(UpgradeId.TERRANINFANTRYARMORSLEVEL1) == 0 and self.bot.can_afford(UpgradeId.TERRANINFANTRYARMORSLEVEL1):
+            bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
+            if bay_ready:
+                self.bot.research(UpgradeId.TERRANINFANTRYARMORSLEVEL1)
     
     async def build_factory(self):
         for commandCenter in self.bot.townhalls().ready:
             if self.bot.can_afford(UnitTypeId.FACTORY) and self.bot.structures(UnitTypeId.FACTORY).amount <1:
                 if(self.bot.structures.closer_than(25, commandCenter.position).filter(lambda structure: structure.type_id == UnitTypeId.FACTORY).amount < 1):
                     position_towards_map_center=commandCenter.position.towards(
-                        self.bot.game_info.map_center, distance=12)
+                        self.bot.game_info.map_center, distance=10)
                     await self.bot.build(UnitTypeId.FACTORY, position_towards_map_center)
 
     async def build_armory(self):
         for commandCenter in self.bot.townhalls().ready:
-            if self.bot.can_afford(UnitTypeId.ARMORY):
+            if self.bot.can_afford(UnitTypeId.ARMORY) and self.bot.structures(UnitTypeId.ARMORY).amount <1  :
                 if(self.bot.already_pending(UnitTypeId.ARMORY) + self.bot.structures(UnitTypeId.ARMORY).amount < 1):
                     position_towards_map_center=commandCenter.position.towards(
-                        self.bot.game_info.map_center, distance=8)
+                        self.bot.game_info.map_center, distance=7)
                     await self.bot.build(UnitTypeId.ARMORY, position_towards_map_center)
+
+        if self.bot.already_pending_upgrade(UpgradeId.TERRANINFANTRYWEAPONSLEVEL2) == 0 and self.bot.can_afford(UpgradeId.TERRANINFANTRYWEAPONSLEVEL2):
+            bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
+            if bay_ready:
+                self.bot.research(UpgradeId.TERRANINFANTRYWEAPONSLEVEL2)
+
+        if self.bot.already_pending_upgrade(UpgradeId.TERRANINFANTRYARMORSLEVEL2) == 0 and self.bot.can_afford(UpgradeId.TERRANINFANTRYARMORSLEVEL2):
+            bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
+            if bay_ready:
+                self.bot.research(UpgradeId.TERRANINFANTRYARMORSLEVEL2)
+
+        if self.bot.already_pending_upgrade(UpgradeId.TERRANINFANTRYWEAPONSLEVEL3) == 0 and self.bot.can_afford(UpgradeId.TERRANINFANTRYWEAPONSLEVEL3):
+            bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
+            if bay_ready:
+                self.bot.research(UpgradeId.TERRANINFANTRYWEAPONSLEVEL3)
+
+        if self.bot.already_pending_upgrade(UpgradeId.TERRANINFANTRYARMORSLEVEL3) == 0 and self.bot.can_afford(UpgradeId.TERRANINFANTRYARMORSLEVEL3):
+            bay_ready = self.bot.structures(UnitTypeId.ENGINEERINGBAY).ready
+            if bay_ready:
+                self.bot.research(UpgradeId.TERRANINFANTRYARMORSLEVEL3)
 
     async def build_starport(self):
         for commandCenter in self.bot.townhalls().ready:
             if self.bot.can_afford(UnitTypeId.STARPORT):
                 if(self.bot.already_pending(UnitTypeId.STARPORT) + self.bot.structures(UnitTypeId.STARPORT).amount < 1):
                     position_towards_map_center=commandCenter.position.towards(
-                        self.bot.game_info.map_center, distance=8)
+                        self.bot.game_info.map_center, distance=7)
                     await self.bot.build(UnitTypeId.STARPORT, position_towards_map_center)
 
     async def build_barracks(self):
@@ -69,7 +94,7 @@ class MilitarWorker():
                 if not self.bot.already_pending(UnitTypeId.BARRACKS):
                     if(self.bot.structures.closer_than(25, commandCenter.position).filter(lambda structure: structure.type_id == UnitTypeId.BARRACKS).amount < 2):
                         position_towards_map_center=commandCenter.position.towards(
-                            self.bot.game_info.map_center, distance=14)
+                            self.bot.game_info.map_center, distance=16)
                         await self.bot.build(UnitTypeId.BARRACKS, position_towards_map_center)
                         #SELECIONAR AS BARRACA PERTO E DAR O UPGRADE QUE FAZ MARAUDER
 
@@ -93,6 +118,7 @@ class MilitarWorker():
         elif self.bot.can_afford(UnitTypeId.MARINE) and self.bot.units(UnitTypeId.MARINE).amount < 8:
             unit = UnitTypeId.MARINE
         elif self.bot.can_afford(UnitTypeId.MARAUDER):
+
             unit = UnitTypeId.MARAUDER
         elif self.bot.can_afford(UnitTypeId.MARINE):
             unit = UnitTypeId.MARINE
@@ -100,7 +126,12 @@ class MilitarWorker():
             return
         for rax in self.bot.structures.of_type({UnitTypeId.BARRACKS, UnitTypeId.STARPORT}).ready.idle:
             if(unit == UnitTypeId.MARAUDER and rax.type_id == UnitTypeId.BARRACKS and rax.has_techlab):
-                rax.train(unit)
+                if(rax.has_techlab):
+                    rax.train(unit)
+                elif(self.bot.units(UnitTypeId.MEDIVAC).amount == 3):
+                    rax.train(UnitTypeId.MARINE)
+                else:
+                    return
             elif(unit == UnitTypeId.MARINE and rax.type_id == UnitTypeId.BARRACKS):
                 rax.train(unit)
             elif(unit == UnitTypeId.MEDIVAC and rax.type_id == UnitTypeId.STARPORT):

@@ -33,7 +33,7 @@ class FighterAgent():
     # Send marines in waves of 8, each time 8 are idle, send them to their death
     async def proxyattack(self):
         marines: Units = self.bot.units(UnitTypeId.MARINE).idle
-        if marines.amount > 2:
+        if marines.amount >= 8:
             target: Point2 = self.bot.enemy_structures.random_or(self.bot.enemy_start_locations[0]).position
             for marine in marines:
                 marine.attack(target)
@@ -92,13 +92,11 @@ class FighterAgent():
                 self.bot.do(unit.attack(self.bot.enemy_units.center))
             else:
                 self.bot.do(unit.attack(target)) #.random_on_distance(15)
-            if len(unit.buffs)>0:
-                print(unit.buffs)
         for unit in medivac:
             self.bot.do(unit.attack(bio.closest_to(self.bot.enemy_start_locations[0])))
         if len(army)<5:
             self.ataqueutil = False
-            self.bot.do(unit.move(self.defesa))
+            #self.bot.do(unit.move(self.defesa))
 
             
 
